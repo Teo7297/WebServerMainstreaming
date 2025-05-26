@@ -1,0 +1,6 @@
+Testing 
+a
+normal
+text
+file.
+Hello!
