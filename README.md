@@ -17,10 +17,13 @@ In theory the CMakeLists script supports linux compilation, but it hasn't been t
 - C++20 compatible compiler
 - CMake for building (version 3.20+)
 - Dependencies:
-  - [cpp-httplib](https://github.com/yhirose/cpp-httplib) (HTTP/HTTPS server implementation)
-  - [cpptime](https://github.com/clarifysky/cpptime) (Timer functionality)
-  - [INIReader](https://github.com/benhoyt/inih) (INI file parser)
-  - [OpenSSL](https://github.com/openssl/openssl) (SSL secure connection)
+  - [cpp-httplib](https://github.com/yhirose/cpp-httplib) (HTTP/HTTPS server implementation, INCLUDED)
+  - [cpptime](https://github.com/clarifysky/cpptime) (Timer functionality, INCLUDED)
+  - [INIReader](https://github.com/benhoyt/inih) (INI file parser, INCLUDED)
+  - [OpenSSL](https://github.com/openssl/openssl) (SSL secure connection, NOT INCLUDED)
+
+Note: On windows, OpenSSL can be installed from the official OpenSSL binaries [webpage](https://slproweb.com/products/Win32OpenSSL.html).
+The CMakeLists script relies on the default install location suggested by the installer, if it's installed in another location, be sure to update the script.
 
 ## Building the project
 
