@@ -32,7 +32,7 @@ namespace MC
                             }
                             else
                             {
-                                std::cerr << "Failed to open log file: " << m_logFilePath.string() << std::endl;
+                                std::cerr << "Failed to open log file: " << m_logFilePath.string() << " probably the log folder does not exist" << std::endl;
                             }
                         }
                         else

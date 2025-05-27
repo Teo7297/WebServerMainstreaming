@@ -1,6 +1,8 @@
 # WebServerMainstreaming
 
 A C++ web server with file caching, configurable settings, and logging capabilities. Developed for a job interview at *MainStreaming*
+This project has been developed and tested on a WINDOWS machine.
+In theory the CMakeLists script supports linux compilation, but it hasn't been tested.
 
 ## Features
 
@@ -20,14 +22,22 @@ A C++ web server with file caching, configurable settings, and logging capabilit
   - [INIReader](https://github.com/benhoyt/inih) (INI file parser)
   - [OpenSSL](https://github.com/openssl/openssl) (SSL secure connection)
 
-## Installation
+## Building the project
 
+Run the following to configure and build the project:
 ```bash
-git clone https://github.com/yourusername/WebServerMainstreaming.git
+git clone https://github.com/Teo7297/WebServerMainstreaming.git
 cd WebServerMainstreaming
-mkdir build && cd build
+mkdir build
+cd build
 cmake ..
-make
+cmake --build . --config Release --target ALL_BUILD
+```
+
+Then you can execute the project:
+```bash
+cd ..
+.\build\Release\WebServerMainstreaming.exe "examples/config.ini"
 ```
 
 ## Configuration
@@ -43,13 +53,15 @@ CertificateKey=key.pem
 LogPath=logs/server.log
 ```
 
+The path to the config file will then have to be passed as argument to the executable, like in the example above.
+
 ### Configuration Options
 
 | Option         | Description                                  | Default           |
 | -------------- | -------------------------------------------- | ----------------- |
 | Port           | The port on which the server will listen     | 8080              |
 | ContentDir     | Directory containing files to serve          | ./content         |
-| CacheTTL       | Cache time-to-live in seconds                | 3600              |
+| CacheTTL       | Server cache time-to-live in seconds         | 3600              |
 | Certificate    | Path to SSL certificate for HTTPS (optional) | -                 |
 | CertificateKey | Path to SSL key for HTTPS (optional)         | -                 |
 | LogPath        | Path to save log files                       | ./logs/server.log |
