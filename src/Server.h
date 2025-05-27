@@ -12,6 +12,9 @@ namespace MC
 {
     class Cache;
     class Logger;
+
+    /// @brief Main server class that allows for server setup and creation.
+    /// It supports both HTTP and HTTPS and reads the setup configuration from a specified configuration INI file.
     class Server
     {
     public:
@@ -31,9 +34,11 @@ namespace MC
         /// @return Bool result
         bool IsConfigLoaded() const { return m_configLoaded; }
 
-        /// @brief Creates and runs the HTTP server using the pre-setted configuration.
+        /// @brief Creates and runs the server using the pre-setted configuration.
+        /// This method automatically creates an HTTPS server if the necessary certificate and key are provided in the config file,
+        /// otherwise it will fallback to HTTP.
         /// @return False if a configuration was not set before calling this function. True otherwise.
-        bool CreateHTTPServer();
+        bool CreateServer();
 
     private:
         /// @brief Obtain a more readable string that represents the file size 
@@ -49,7 +54,7 @@ namespace MC
         /// @brief Obtain the HTML code necessary to render the page that serves the static files in the requested directory
         /// @param dir Path to the desired directory
         /// @return String containing the HTML code
-        std::string GetHTML(fs::path dir);
+        std::string GetHTML(const fs::path& dir);
 
     private:
 

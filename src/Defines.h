@@ -12,5 +12,6 @@
 #include <queue>
 #include <mutex>
 #include <atomic>
+#include <iomanip>
 
 namespace fs = std::filesystem;

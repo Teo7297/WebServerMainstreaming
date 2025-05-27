@@ -4,6 +4,7 @@
 
 namespace MC
 {
+    /// @brief Simple logger class that manages two things: a main thread log queue and a logging thread that deals with I/O write operations. 
     class Logger
     {
     public:

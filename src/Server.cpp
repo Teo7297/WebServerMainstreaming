@@ -4,6 +4,8 @@
 #include "Logger.h"
 
 #include "INIreader/INIreader.hpp"
+
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib/httplib.h"
 
 
@@ -35,9 +37,10 @@ namespace MC
                     if(!m_cache->GetCachedFile(filePath, fileData))
                     {
                         // Then try to read the file from disk
-                        std::cout << "File not in cache, reading from file..." << std::endl;
+                        std::cout << "File not in cache, reading from disk..." << std::endl;
                         std::ifstream fileStream(filePath, std::ios::binary);
-                        if(!fileStream) {
+                        if(!fileStream)
+                        {
                             res.status = 500;
                             res.set_content("Failed to open file", "text/plain");
                             std::cerr << "Failed to open file: " << filePath.string() << std::endl;
@@ -60,18 +63,20 @@ namespace MC
 
                     std::cout << "Serving file: " << filePath.string() << std::endl;
                 }
-                else {
+                else
+                {
                     res.status = 404;
                     res.set_content("File not found", "text/plain");
                     std::cout << "File not found: " << filePath.string() << std::endl;
                 }
             };
 
-        m_errorHandler = [](const httplib::Request& req, httplib::Response& res) {
-            auto fmt = "<p>Error Status: <span style='color:red;'>%d</span></p>";
-            char buf[BUFSIZ];
-            snprintf(buf, sizeof(buf), fmt, res.status);
-            res.set_content(buf, "text/html");
+        m_errorHandler = [](const httplib::Request& req, httplib::Response& res)
+            {
+                auto fmt = "<p>Error Status: <span style='color:red;'>%d</span></p>";
+                char buf[BUFSIZ];
+                snprintf(buf, sizeof(buf), fmt, res.status);
+                res.set_content(buf, "text/html");
             };
 
         m_loggerHandler = [this](const httplib::Request& req, const httplib::Response& res)
@@ -139,7 +144,7 @@ namespace MC
         std::cout << "  Log Path: " << m_logPath << std::endl;
     }
 
-    bool Server::CreateHTTPServer()
+    bool Server::CreateServer()
     {
         if(!m_configLoaded)
         {
@@ -147,31 +152,56 @@ namespace MC
             return false;
         }
 
-        httplib::Server server;
+        //! We don't need SSLServer specific methods, so it's ok to just use a pointer to the base class.
+        //! This allows for both implementations with cleaner code.
+        std::unique_ptr<httplib::Server> server;
+
+        // Try to create the HTTPS server
+        server = std::make_unique<httplib::SSLServer>(m_certificate.c_str(), m_certificateKey.c_str());
+        if(!server->is_valid())
+        {
+            std::cout << "[SERVER] Certificate or key not found, falling back to HTTP" << std::endl;
+
+            // fallback to HTTP
+            server = std::make_unique<httplib::Server>();
+            if(!server->is_valid())
+            {
+                std::cerr << "[ERROR] Server could not be created with or without SSL" << std::endl;
+                return false;
+            }
+            else
+            {
+                std::cout << "[SERVER] HTTP server created" << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << "[SERVER] HTTPS server created" << std::endl;
+        }
 
         // Setup the server with the loaded configuration
-        server.set_base_dir(m_contentDir.string());
-        server.set_mount_point("/", m_contentDir.string());
-        server.set_keep_alive_max_count(100);
-        server.set_keep_alive_timeout(60);
+        server->set_base_dir(m_contentDir.string());
+        server->set_mount_point("/", m_contentDir.string());
+        server->set_keep_alive_max_count(100);
+        server->set_keep_alive_timeout(60);
 
         // Setup routes 
-        server.Get("/", [this](const httplib::Request& req, httplib::Response& res)
+        server->Get("/", [this](const httplib::Request& req, httplib::Response& res)
             {
                 std::string html = GetHTML(m_contentDir);
                 res.set_content(html, "text/html");
             });
 
         // Setup custom handlers
-        server.set_file_request_handler(m_fileRequestHandler);
-        server.set_error_handler(m_errorHandler);
-        server.set_logger(m_loggerHandler);
+        server->set_file_request_handler(m_fileRequestHandler);
+        server->set_error_handler(m_errorHandler);
+        server->set_logger(m_loggerHandler);
 
         // Bind and listen
         std::cout << "Starting server on port " << m_port << "..." << std::endl;
 
         // Listen starts the server (blocking call)
-        if(!server.listen("0.0.0.0", m_port))
+        if(!server->listen("0.0.0.0", m_port))
             std::cerr << "Failed to start server on port " << m_port << std::endl;
 
         std::cout << "Server stopped!" << std::endl;
@@ -205,7 +235,7 @@ namespace MC
         return files;
     }
 
-    std::string Server::GetHTML(fs::path dir)
+    std::string Server::GetHTML(const fs::path& dir)
     {
         std::vector<fs::path> files = this->GetFilesInDirectory(dir);
         std::stringstream html;

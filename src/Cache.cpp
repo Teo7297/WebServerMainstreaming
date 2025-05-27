@@ -1,5 +1,4 @@
 #include "Cache.h"
-#include "cpptime/cpptime.h"
 
 namespace MC
 {
@@ -16,8 +15,7 @@ namespace MC
 
         m_cache[filePath] = fileData;
 
-        CppTime::Timer t;
-        t.add(std::chrono::seconds(m_ttl), [&](CppTime::timer_id) { m_cache.erase(filePath); });
+        m_timer.add(std::chrono::seconds(m_ttl), [this, filePath](CppTime::timer_id) { std::cout << "Erasing " << std::quoted(filePath.filename().string()) << " from cache\n"; m_cache.erase(filePath); });
 
         return true;
     }

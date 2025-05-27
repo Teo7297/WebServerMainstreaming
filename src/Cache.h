@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Defines.h"
+#include "cpptime/cpptime.h"
 
 namespace MC
 {
+    /// @brief This class represets the server side file cache system. Files can be read from disk using a data stream and stored in a common std::string.
+    /// This class offers a simple TTL functionality to manage data lifetime.
     class Cache
     {
         using FileData = std::string;
@@ -31,6 +34,7 @@ namespace MC
     private:
         std::unordered_map<fs::path, FileData> m_cache;
         int m_ttl;
+        CppTime::Timer m_timer;
     };
 
 }
