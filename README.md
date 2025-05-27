@@ -66,6 +66,10 @@ The path to the config file will then have to be passed as argument to the execu
 | CertificateKey | Path to SSL key for HTTPS (optional)         | -                 |
 | LogPath        | Path to save log files                       | ./logs/server.log |
 
+## SSL support
+
+The web server supports SSL connection. To enable it, generate a certificate-key pair and specify in the config INI file the path to those files. You can easily generate them using the provided tool: `tools/generate_certificate.bat`
+
 ## Usage
 
 ```cpp
