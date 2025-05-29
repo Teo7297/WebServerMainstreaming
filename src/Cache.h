@@ -21,7 +21,7 @@ namespace MC
 
         /// @brief Add a file to the cache
         /// @param[in] filePath Path of the file on disk, used as key to store the data
-        /// @param[out] outData Output data stored in a std::string
+        /// @param[in] fileData Data stored in a std::string
         /// @return Success
         bool AddCachedFile(const fs::path& filePath, const std::string& fileData);
 
